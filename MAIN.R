@@ -127,7 +127,55 @@ pdf('MMRNHep/output/Figures/Figure2D.pdf')
 print(g)
 dev.off()
 
+#######################  get enriched GO Biological Processes  - Figure 2E (write to output/Figures)
 
+combinedDotPlot = function(resLFC,homology,contrasts){
+  gseDat = list()
+  for (contrast in contrasts){
+    search = paste('contrast_',contrast,'_',sep='')
+    resLFC$entrez = homologyMap$NCBI.gene..formerly.Entrezgene..ID[match(resLFC$genes,homologyMap$Gene.stable.ID)]
+    df = resLFC[ , grepl( search , names( resLFC ) ) ]
+    parts = str_split(colnames(df)[1],'lg2BaseMean_')
+    title = parts[[1]][2]
+    print(title)
+    df = data.frame(entrez = resLFC$entrez,lfc = df[,4],padj=df[,3])
+    df = df[!is.na(df$entrez),]
+    df = subset(df,abs(df$lfc) > 1 & df$padj <= 0.05)
+    de = unique(df$entrez)
+    gseDat[[title]] = de
+  }
+  ck = compareCluster(geneCluster = gseDat, 
+                      fun = "enrichGO",
+                      pAdjustMethod = "BH",
+                      OrgDb = "org.Mm.eg.db", 
+                      ont = "bp", 
+                      readable = TRUE, 
+                      qvalueCutoff  = 0.05)
+  return(ck)
+}
+
+resLFC = read.csv('MMRNHep/output/resLFC.csv',header = TRUE,sep = ',')
+resLFC$X = NULL
+homologyMap = read.csv('MMRNHep/data/homologyMap.tab',header = TRUE, sep = '\t')
+contrasts = c(1,2,3,4,5,6,7,8,9,10)
+p = combinedDotPlot(resLFC,homology,contrasts)
+
+
+
+
+rxnKO = read.csv('output/reactionKO.csv',sep=',',header = T)
+rowAnnot = rxnKO[,1:2]
+row.names(rowAnnot) = rowAnnot$X
+rowAnnot$X = NULL
+row.names(rxnKO) = rxnKO$X
+rxnKO$X = NULL
+rxnKO$biomass_SUBSYSTEM = NULL
+pheatmap(rxnKO,
+         cluster_cols = F,
+         cluster_rows = T,
+         annotation_row = rowAnnot,
+         fontsize_row = 1,
+         fontsize_col = 10)
 
 
 
