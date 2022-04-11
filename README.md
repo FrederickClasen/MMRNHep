@@ -1,6 +1,6 @@
 # MMRNHep Clasen et al (in preperation)
 
-All scripts used to produce the results in Clasen et al (DOI). Please see publication for detail.
+All scripts used to produce the results in Clasen et al. Please see publication for detail.
 
 1. MAIN.R : R script for the analysis of transcriptomics data
 * DESeq2 : PCA and differential gene expression
