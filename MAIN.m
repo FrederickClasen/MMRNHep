@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% IMPORTS 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -9,20 +9,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%          ADD THE PATHS TO RAVEN AND COBRA          %%%%%%%%%%%%%%%%%%%%%%%
-
-addpath(genpath('/Users/clasenf/OneDrive - The Francis Crick Institute/PhD Pathway/Mouse model paper/DataRepo/git')); % CURRENT PATH
+clear;
+addpath(genpath('/Users/clasenf/OneDrive - The Francis Crick Institute/PhD Pathway/Mouse model paper/v22/MMRN')); % CURRENT PATH
 addpath(genpath('/Users/clasenf/GEM/Raven/')); % RAVEN TOOLBOX
 addpath(genpath('/Users/clasenf/GEM/COBRA/')); % COBRA TOOLBOX
 changeCobraSolver('mosek','all');              % SEE MOSEK WEBSITE FOR MORE DETAIL
 setRavenSolver('mosek');                       % SEE MOSEK WEBSITE FOR MORE DETAIL
 
+%%%%%%%%%%%%%%          IMPORT GENERIC HEPATIC MODEL          %%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%          IMPORT GENERIC DIET CONSTRAINT GSMMS          %%%%%%%%%%%%%%%%%%%%%%
+model = importExcelModel('data/models/xlsx/genericLiver.xlsx',false); % GENERIC HEPATIC MODEL MODEL
 
-models(1).name = 'WD';
-models(2).name = 'CD';
-models(1).model = importExcelModel('data/models/xlsx/genericLiverWD.xlsx',false); % GENERIC WD MODEL
-models(2).model = importExcelModel('data/models/xlsx/genericLiverCD.xlsx',false); % GENERIC CD MODEL
+rxnsToDelete = {'AATAi','HMR_6404','PSERT'};
+model = removeReactions(model,rxnsToDelete,true,true,true);
 
 % RER AND OBJECTIVES
 RERRxns = {'EXC_IN_C00007[s]','EXC_OUT_C00011[s]'};
@@ -37,42 +36,62 @@ nonObjective = {'HMR_biomass_Renalcancer(with ATP)',... % RXNS THAT SHOULD BE BL
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% RUN FLUX SIMULATIONS FOR GENERIC AND CONSTRAINT-BASED GSMMs %% 
 
-%% RUN FLUX SIMULATIONS FOR GENERIC AND CONSTRAINT-BASED GSMMs %%
-
+% load diet information
+experiment = 'NORMAL';
+load('data/diet.mat');
 conditions = {'nonDEN_Liver_CD','nonDEN_Liver_WD','DEN_Liver_CD','DEN_AdjLiver_WD','DEN_Tumour_WD'};
-fluxVector = zeros(length(models(1).model.rxns),(length(conditions)*2)+2); % FLUX VECTOR FOR TWO GENERIC MODELS AND CONDITION MODELS
+fluxVector = zeros(length(model.rxns),(length(conditions)*2)+2); % FLUX VECTOR FOR TWO GENERIC MODELS AND CONDITION MODELS
 
 counter = 0;
-
-for i=1:length(models)
+diets = {'WD','CD'};
+% SIMULATE FOR TWO DIETS
+for i=1:length(diets)
     counter = counter + 1;
-    modelNames{counter} = models(i).name;
-    model = models(i).model;
-    model = setParam(model,'lb',RERRxns,[17,13]);
-    model = setParam(model,'obj',objective,1);
-    model = setParam(model,'eq',nonObjective,0);
-    fba = solveLP(model,1);
+    modelNames{counter} = char("generic"+string(diets{i}));
+    
+    dModel = model;   % generic model
+    dModel = setParam(dModel,'ub',dModel.rxns(contains(dModel.rxns,'_IN_')),0);
+    dModel = setParam(dModel,'ub',dModel.rxns(contains(dModel.rxns,'_BOTH_')),0);
+    
+    %SET DIET CONSTRAINT - THIS CAN BE CHANGED TO SWAP INDIVIDUAL
+    %COMPONENTS WHEN RUNNING ONE DIET
+    dModel = setParam(dModel,'ub',diet.aa.rxns,diet.aa.ub(:,i));
+    dModel = setParam(dModel,'ub',diet.carbs.rxns,diet.carbs.ub(:,i));
+    dModel = setParam(dModel,'ub',diet.lipids.rxns,diet.lipids.ub(:,i));
+    dModel = setParam(dModel,'ub',diet.other.rxns,diet.other.ub(:,i));
+    
+    % SET RER AND OBJECTIVE
+    dModel = setParam(dModel,'lb',RERRxns,[17,13]);
+    dModel = setParam(dModel,'ub',RERRxns,[1000,1000]);
+    dModel = setParam(dModel,'obj',objective,1);
+    dModel = setParam(dModel,'eq',nonObjective,0);
+    fba = solveLP(dModel,1);
     fluxVector(:,counter) = fba.x;
+    
     for j=1:length(conditions)
         counter = counter + 1;
-        modelNames{counter} = char(string(models(i).name) + '_' + string(conditions(j)));
-        model = models(i).model;
+        modelNames{counter} = char(string(diets(i)) + '_' + string(conditions(j)));
+        %model = models(i).model;
         fc = 'data/Eflux/' + string(conditions(j)) + '.csv';
         constraints = importdata(fc);
-        outModel = addConstraints(model,constraints);  % EFLUX CONSTRAINT
+        csModel = dModel;
+        csModel = addConstraints(csModel,constraints);  % EFLUX CONSTRAINT
         
         if contains(conditions(j),'nonDEN')
-            outModel = setParam(outModel,'lb',RERRxns,[15,11]); % RER CONSTRAINT
+            csModel = setParam(csModel,'lb',RERRxns,[15,11]); % RER CONSTRAINT
+            csModel = setParam(csModel,'ub',RERRxns,[1000,1000]);
         else
-            outModel = setParam(outModel,'lb',RERRxns,[17,13]); % RER CONSTRAINT
+            csModel = setParam(csModel,'lb',RERRxns,[17,13]); % RER CONSTRAINT
+            csModel = setParam(csModel,'ub',RERRxns,[1000,1000]);
         end
         
-        outModel = setParam(outModel,'obj',objective,1);
-        outModel = setParam(outModel,'ub',objective,1000);
-        outModel = setParam(outModel,'eq',nonObjective,0);
+        csModel = setParam(csModel,'obj',objective,1);
+        csModel = setParam(csModel,'ub',objective,1000);
+        csModel = setParam(csModel,'eq',nonObjective,0);
         
-        fba = solveLP(outModel,1);
+        fba = solveLP(csModel,1);
         disp(fba.f);
         
         fluxVector(:,counter) = fba.x;
@@ -81,7 +100,7 @@ for i=1:length(models)
     
 end
 
-tempModel = models(1).model;
+tempModel = model;
 T = table(tempModel.rxns,...
        constructEquations(tempModel,tempModel.rxns,true),...
        tempModel.grRules,...
@@ -91,15 +110,5 @@ T = [T T2];
 colheads = {'ID','EQUATION','GENEASSOCIATION','SUBSYSTEM'};
 colheads = [colheads modelNames];
 T.Properties.VariableNames = colheads;
-writetable(T,'TableS3.xlsx','Sheet','TableS3','WriteVariableNames',true);
-
-
-
-
-
-
-
-
-
-
+writetable(T,'FLUXES.xlsx','Sheet',experiment,'WriteVariableNames',true);
 
