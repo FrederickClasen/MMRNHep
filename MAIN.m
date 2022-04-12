@@ -1,31 +1,20 @@
-%% IMPORTS 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% FLUX SIMULATIONS PRESENTED IN CLASEN ET AL              %%%%%%%%%%%%%
+% COBRA and RAVEN has to be added to the path to run the simulations
 
-%%%%%%%%%%%%          FLUX SIMULATIONS PRESENTED IN CLASEN ET AL              %%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%          ADD THE PATHS TO RAVEN AND COBRA          %%%%%%%%%%%%%%%%%%%%%%%
 clear;
-addpath(genpath('/Users/clasenf/OneDrive - The Francis Crick Institute/PhD Pathway/Mouse model paper/v22/MMRN')); % CURRENT PATH
-addpath(genpath('/Users/clasenf/GEM/Raven/')); % RAVEN TOOLBOX
-addpath(genpath('/Users/clasenf/GEM/COBRA/')); % COBRA TOOLBOX
-changeCobraSolver('mosek','all');              % SEE MOSEK WEBSITE FOR MORE DETAIL
-setRavenSolver('mosek');                       % SEE MOSEK WEBSITE FOR MORE DETAIL
+changeCobraSolver('mosek','all'); % SEE MOSEK WEBSITE FOR MORE DETAIL
+setRavenSolver('mosek');          % SEE MOSEK WEBSITE FOR MORE DETAIL
 
 %%%%%%%%%%%%%%          IMPORT GENERIC HEPATIC MODEL          %%%%%%%%%%%%%%%%%%%%%%
 
 model = importExcelModel('data/models/xlsx/genericLiver.xlsx',false); % GENERIC HEPATIC MODEL MODEL
 
-rxnsToDelete = {'AATAi','HMR_6404','PSERT'};
-model = removeReactions(model,rxnsToDelete,true,true,true);
+rxnsToDelete = {'AATAi','HMR_6404','PSERT'}; % BAD RXNS IN MODEL
+model = removeReactions(model,rxnsToDelete,true,true,true); 
 
 % RER AND OBJECTIVES
-RERRxns = {'EXC_IN_C00007[s]','EXC_OUT_C00011[s]'};
-objective = {'MMRN_Biomass'}; % OBJECTIVE FUNCTION
+RERRxns = {'EXC_IN_C00007[s]','EXC_OUT_C00011[s]'};     
+objective = {'MMRN_Biomass'};                           % OBJECTIVE FUNCTION
 nonObjective = {'HMR_biomass_Renalcancer(with ATP)',... % RXNS THAT SHOULD BE BLOCKED AS POTENTIAL ADDITIONAL OBJECTIVES
                 'EXC_OUT_ATP',...
                 'EXC_OUT_Lipid_pool_biomass',...
