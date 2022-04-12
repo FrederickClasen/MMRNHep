@@ -1,6 +1,4 @@
-library("ggvenn")
 library("genefilter")
-library("ggplot2")
 library("ggrepel")
 library('ggupset')
 library("DESeq2")
@@ -26,6 +24,10 @@ library("vsn")
 library("R.utils")
 library("optparse")
 library('circlize')
+
+
+
+library("ggplot2")
 theme = theme(panel.background = element_blank(),
               panel.border=element_rect(fill=NA),
               panel.grid.major = element_blank(),
@@ -131,9 +133,6 @@ for (comp in comps){
 }
 # table with DEGs for each contrast
 write.csv(resTable,'MMRNHep/output/resLFC.csv')
-
-
-#######################  get DEGs against nonDEN_liver_CD  - Figure 2D (write to output/Figures)
 
 
 #######################  get enriched GO Biological Processes  - Figure 2E (write to output/Figures)
