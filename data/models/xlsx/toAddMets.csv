@@ -1,0 +1,19 @@
+ID,#,NAME,UNCONSTRAINED,MIRIAM,COMPOSITION,InChI,COMPARTMENT,REPLACEMENT ID,CHARGE
+"1-phosphatidyl-1D-myo-inositol 3,4,5-trisphosphate[r]",,"1-phosphatidyl-1D-myo-inositol 3,4,5-trisphosphate",,kegg.compound/C05981,C9H13O18P4FULLRCO2FULLR2CO2,,r,C05981[r],
+5-deoxyadenosine[c],,5-deoxyadenosine,,kegg.compound/C05198,C10H13N5O3,,c,C05198[c],
+9-O-acetylated-GD3[c],,9-O-acetylated-GD3,,,C55H92N3O30R,,c,Cx711[c],
+9-O-acetylated-GD3[g],,9-O-acetylated-GD3,,,C55H92N3O30R,,g,Cx711[g],
+Ganglioside Gm1[c],,Ganglioside Gm1,,hmdb/HMDB00117;kegg.compound/C04911,C55H95N3O30FULLRCO,,c,Cx2530[c],-1.0
+Ganglioside Gm1[g],,Ganglioside Gm1,,hmdb/HMDB00117;kegg.compound/C04911,C55H95N3O30FULLRCO,,g,Cx2530[g],-1.0
+GD1beta[g],,GD1beta,,,C67H113N4O39R,,g,Cx971[g],0.0
+Gd3[c],,Gd3,,kegg.compound/C06133,C52H88N3O28FULLRCO,,c,C06133[c],
+Gd3[g],,Gd3,,kegg.compound/C06133,C52H88N3O28FULLRCO,,g,C06133[g],
+xylitol[c],,xylitol,,obo.chebi:CHEBI/17151,C5H12O5,,c,C00379[c],
+PG-CL pool[c],,PG-CL pool,,,,,c,m81[c],-3.0
+biomass[x],,biomass,1.0,,X,,x,biomass[x],
+cofactor_pool_biomass[c],,cofactor_pool_biomass,,,,,c,cofactor_pool_biomass[c],
+protein_pool_biomass[c],,protein_pool_biomass,,,,,c,protein_pool_biomass[c],0.0
+lipid_pool_biomass[c],,lipid_pool_biomass,,,,,c,lipid_pool_biomass[c],0.0
+nucleotide_pool_biomass[c],,nucleotide_pool_biomass,,,,,c,nucleotide_pool_biomass[c],0.0
+glycogen_pool_biomass[c],,glycogen_pool_biomass[c],,,,,c,glycogen_pool_biomass[c],0.0
+metabolite_pool_biomass[c],,metabolite_pool_biomass,,,,,c,metabolite_pool_biomass[c],0.0
