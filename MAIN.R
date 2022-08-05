@@ -132,7 +132,7 @@ for (comp in comps){
   resTable[player] = res$log2FoldChange
 }
 # table with DEGs for each contrast
-write.csv(resTable,'MMRNHep/output/resLFC.csv')
+write.csv(resTable,'data/esLFC.csv')
 
 
 #######################  get enriched GO Biological Processes  - Figure 2E (write to output/Figures)
@@ -162,7 +162,7 @@ combinedDotPlot = function(resLFC,homology,contrasts){
   return(ck)
 }
 
-resLFC = read.csv('output/resLFC.csv',header = TRUE,sep = ',')
+resLFC = read.csv('data/resLFC.csv',header = TRUE,sep = ',')
 resLFC$X = NULL
 homologyMap = read.csv('data/homologyMap.tab',header = TRUE, sep = '\t')
 contrasts = c(1,2,3,4,5,6,7,8,9,10)
