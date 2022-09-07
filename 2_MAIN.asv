@@ -13,8 +13,8 @@ objective = {'MMRN_Biomass'};          % OBJECTIVE FUNCTION
 
 % load diet information
 conditions = {'nonDEN_Liver_CD','nonDEN_Liver_WD','DEN_Liver_CD','DEN_AdjLiver_WD','DEN_Tumour_WD'};
-CD = importModel('data/models/sbml/MMRNHep-WD.xml',false);
-WD = importModel('data/models/sbml/MMRNHep-WD.xml',false);
+CD = importModel('model/MMRNHep/CD/MMRNHep-CD.xml',false);
+WD = importModel('model/MMRNHep/WD/MMRNHep-WD.xml',false);
 models = {CD,WD};
 fluxVector = zeros(length(WD.rxns),(length(conditions)*2)+2); 
 diets = {'CD','WD'};
@@ -48,6 +48,17 @@ for i=1:length(diets)
         fba = solveLP(csModel,1);
         fluxVector(:,counter) = fba.x;
         
+        modelName = string(diets{i}) + '_' + string(conditions{j});
+        exportModel(csModel,char(modelName + '.xml'));
+        exportToExcelFormat(csModel,char(modelName + '.xlsx'));
+        
     end
     
 end
+
+%%
+
+
+
+
+

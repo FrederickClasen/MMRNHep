@@ -1,11 +1,11 @@
 # MMRNHep Clasen et al (in preperation)
 
-All scripts used to produce the results in Clasen et al. Please see publication for detail.
+Data and scripts for  Clasen et al. Please see publication for detail.
 
-Models are available in data folder
+All models are available in the model directory. This includes the mouse model MMRN, the generic mouse hepatic model MMRNHep, as well as all constrained models
 
-1. MAIN.m : MATLAB script to run flux simulations
+Scripts available are as follows:
 
-2. MAIN.R : R script for the analysis of transcriptomics data
-* DESeq2 : PCA and differential gene expression
-* clusterprofiler : enrichment analysis
+1_MAIN.R : R script for the analysis of transcriptomics data
+2_Eflux.ipynb : Jupyter notebook to generate constraints
+3_MAIN.m : MATLAB script to perform flux simulations 
