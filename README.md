@@ -6,6 +6,6 @@ All models are available in the model directory. This includes the mouse model M
 
 Scripts available are as follows:
 
-1_MAIN.R : R script for the analysis of transcriptomics data
-2_Eflux.ipynb : Jupyter notebook to generate constraints
-3_MAIN.m : MATLAB script to perform flux simulations 
+1_MAIN.R : R script for the analysis of transcriptomics data <br />
+2_Eflux.ipynb : Jupyter notebook to generate constraints <br />
+3_MAIN.m : MATLAB script to perform flux simulations  <br />
