@@ -54,11 +54,6 @@ for i=1:length(diets)
     
 end
 
-%%
-
-model = importExcelModel('model/MMRNHep/MMRNHep.xlsx',false);
-exportModel(model,'model/MMRNHep/MMRNHep.xml');
-
 
 
 
